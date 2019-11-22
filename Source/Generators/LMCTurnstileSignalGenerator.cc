@@ -57,7 +57,7 @@ namespace locust
 
         if(!fPowerCombiner.Configure(aParam))
         {
-            LERROR(lmclog,"Error configuring receiver FIRHandler class");
+            LERROR(lmclog,"Error configuring Power Combiner");
         }
 
     	if(!fHilbertTransform.Configure(aParam))
