@@ -132,6 +132,9 @@ namespace locust
         PatchAntenna *currentPatch;
         unsigned tTotalPatchIndex = 0;
 
+        std::ofstream myfile;
+        myfile.open("example.txt", std::ios::app);
+
         for(int channelIndex = 0; channelIndex < allChannels.size(); ++channelIndex)
         {
             for(int patchIndex = 0; patchIndex < allChannels[channelIndex].size(); ++patchIndex)
@@ -145,6 +148,7 @@ namespace locust
                 LMCThreeVector tRadiatedMagneticField = fFieldSolver.GetMagneticField();
                 locust::Particle tCurrentParticle = fFieldSolver.GetRetardedParticle();
 
+
                 //////////////////////////////////////////////
                 LMCThreeVector tDirection = currentPatch->GetPosition() - tCurrentParticle.GetPosition(true);
                 double tVelZ = tCurrentParticle.GetVelocity(true).Z();
@@ -156,12 +160,17 @@ namespace locust
                 currentPatch->SetIncidentMagneticField( tRadiatedMagneticField );
 
                 aSignal->LongSignalTimeComplex()[channelIndex*signalSize*aSignal->DecimationFactor() + index][0] += currentPatch->GetVoltage();
+                if(tReceiverTime > 1e-7 && tReceiverTime < 2e-7)
+                    myfile << tTotalPatchIndex <<" "<< tReceiverTime <<" "<<tRadiatedElectricField.X()<<" "<<tRadiatedElectricField.Y()<<" "<<tRadiatedElectricField.Z()<<std::endl;
                 //aSignal->LongSignalTimeComplex()[channelIndex*signalSize*aSignal->DecimationFactor() + index][1] += currentPatch->GetVoltage();
 
                 ++tTotalPatchIndex;
 
             } // z_position waveguide element stepping loop.
         } // nChannels loop.
+
+
+        myfile.close();
 
         t_old += tLocustStep;
 
@@ -172,6 +181,7 @@ namespace locust
     void FreeFieldSignalGenerator::InitializePatchArray()
     {
 
+        fNChannels+=2;
         const unsigned nChannels = fNChannels;
         const int nReceivers = fNPatchesPerStrip; //Number of receivers per channel
 
@@ -185,19 +195,50 @@ namespace locust
 
         allChannels.resize(nChannels);
 
-        for(int channelIndex = 0; channelIndex < nChannels; ++channelIndex)
+        for(int channelIndex = 0; channelIndex < nChannels-2; ++channelIndex)
         {
             theta = channelIndex * dThetaArray;
 
             for(int receiverIndex = 0; receiverIndex < nReceivers; ++receiverIndex)
             {
-                zPosition =  (receiverIndex - (nReceivers - 1.) /2.) * patchSpacingZ;
+                zPosition =  (receiverIndex - (nReceivers - 1.) /2.) * fPatchSpacing;
 
                 modelPatch.SetCenterPosition({patchRadius * cos(theta) , patchRadius * sin(theta) , zPosition }); 
                 modelPatch.SetPolarizationDirection({sin(theta), -cos(theta), 0.}); 
                 modelPatch.SetNormalDirection({-cos(theta), -sin(theta), 0.}); //Say normals point inwards
                 allChannels[channelIndex].AddReceiver(modelPatch);
                 fFieldSolver.AddFieldPoint(modelPatch.GetPosition());
+            }
+        }
+
+        //create endcap channels
+        double zMax =  (nReceivers - 1.) / 2. * fPatchSpacing;
+        int nPatchesMax = std::max(int(2. * patchRadius / fPatchSpacing), 1);
+        int nPatchesEnd = 0;
+        for( int i=0;i<nPatchesMax;++i)
+        {
+            double xtmp = -patchRadius + i * fPatchSpacing;
+            for( int j=0;j<nPatchesMax;++j)
+            {
+                double ytmp = -patchRadius + j * fPatchSpacing;
+                double pointRad = sqrt(xtmp*xtmp+ytmp*ytmp);
+
+                if( pointRad < patchRadius)
+                {
+                    ++nPatchesEnd;
+                    modelPatch.SetPolarizationDirection({1,0,0});
+
+                    modelPatch.SetCenterPosition({xtmp , ytmp, zMax });
+                    modelPatch.SetNormalDirection({0,0,-1});
+                    allChannels[nChannels-2].AddReceiver(modelPatch);
+                    fFieldSolver.AddFieldPoint(modelPatch.GetPosition());
+
+                    modelPatch.SetCenterPosition({xtmp , ytmp, -zMax });
+                    modelPatch.SetNormalDirection({0,0,1});
+                    allChannels[nChannels-1].AddReceiver(modelPatch);
+                    fFieldSolver.AddFieldPoint(modelPatch.GetPosition());
+                }
+
             }
         }
     }
