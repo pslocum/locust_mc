@@ -206,30 +206,25 @@ namespace locust
 
 	}
 
-
-        bool PowerCombiner::SetSmatrixDampingFactors()
-        {
-                if (fnPatchesPerStrip != 2 && fnPatchesPerStrip != 4 && fnPatchesPerStrip != 6)
-                {
-	                LERROR(lmclog,"The S-matrix is implemented only for 2, 4, or 6 patches per strip.");
-	                return false;
-                }
-	  
-                SetTransmissionCoefficients();
-                for (unsigned z_index=0; z_index<fnPatchesPerStrip; z_index++)
-                {
-	                fdampingFactors[z_index] = ftransmissionCoefficients[z_index];
-                }
+  bool PowerCombiner::SetSmatrixDampingFactors()
+  {
+    	SetTransmissionCoefficients();
+    	for (unsigned z_index=0; z_index<fnPatchesPerStrip; z_index++)
+    	{
+    		fdampingFactors[z_index] = ftransmissionCoefficients[z_index];
+    	}
+        return true;
 
     }
 
     std::vector<double> PowerCombiner::GetSmatrixElements()
     {
     	std::vector<double> smatrix;
-
-               if (fnPatchesPerStrip == 2) smatrix = fsMatrix2patch;
-               if (fnPatchesPerStrip == 4) smatrix = fsMatrix4patch;
-               if (fnPatchesPerStrip == 6) smatrix = fsMatrix6patch;
+	       
+    	if (fnPatchesPerStrip == 2) smatrix = fsMatrix2patch;
+    	if (fnPatchesPerStrip == 4) smatrix = fsMatrix4patch;
+    	if (fnPatchesPerStrip == 6) smatrix = fsMatrix6patch;
+    	if (fnPatchesPerStrip == 8) smatrix = fsMatrix8patch;
 
         return smatrix;
     }
