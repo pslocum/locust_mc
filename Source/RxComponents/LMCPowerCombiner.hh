@@ -77,19 +77,23 @@ namespace locust
             double fjunctionResistance;
       	    std::vector<double> fdampingFactors;
 
-      	    // Uniform taper S-matrices from HFSS:
-      /*
+      	    // Uniform taper S-matrices
+            // 2-6 patch cases are from HFSS, 8 patch case is extrapolated:
+      
       	    std::vector<double> fsMatrix2patch = {0.2, 0.64, 0.64};
             std::vector<double> fsMatrix4patch = {0.09, 0.47, 0.47, 0.47, 0.47};
             std::vector<double> fsMatrix6patch = {0.03, 0.38, 0.38, 0.38, 0.38, 0.38, 0.38};
-      */
+	    std::vector<double> fsMatrix8patch = {0.03, 0.33, 0.33, 0.33, 0.33, 0.33, 0.33, 0.33, 0.33};
+      
             // end Uniform taper S-matrices.
 
             // 7/8 power combiner S-matrices (traveling wave configuration) from HFSS:
+      /*
             std::vector<double> fsMatrix2patch = {0.12, 0.43, 0.43};
             std::vector<double> fsMatrix4patch = {0.12, 0.3, 0.43, 0.43, 0.3};
             std::vector<double> fsMatrix6patch = {0.12, 0.24, 0.3, 0.43, 0.43, 0.3, 0.24};
             std::vector<double> fsMatrix8patch = {0.12, 0.17, 0.24, 0.3, 0.43, 0.43, 0.3, 0.24, 0.17};
+      */
             // end 7/8 combiner S-matrices.
 
             std::vector<double> ftransmissionCoefficients;
