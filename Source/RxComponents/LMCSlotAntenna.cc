@@ -44,7 +44,11 @@ namespace locust
     	// dipole donut pinch from HFSS, normalized to 1.0 for normal incidence.
     	double dipolePhiPinchFactor = cos(tPhi);
 
-    	return dipoleThetaFactor * dipolePhiPinchFactor;
+    	if (fabs(tTheta-LMCConst::Pi()/2.)>4.*LMCConst::Pi()/180.)  // 4 degree aoi cut.
+    	{
+    		return dipoleThetaFactor * dipolePhiPinchFactor;
+    	}
+    	else return 0.;
     }
 
 
