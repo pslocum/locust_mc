@@ -359,7 +359,6 @@ namespace locust
     		}
 
     		convolution=fTFReceiverHandler.ConvolveWithFIRFilter(ElementFIRBuffer[channel*fNElementsPerStrip+element]);
-    		convolution *= exp(-0.5*pow((25.886e9-fieldfrequency)/25.e6,2.));
 
     		return convolution;
     	}
