@@ -65,7 +65,8 @@ namespace locust
 
         double* tSolution = new double[2];
         tSolution[0] = tEFieldCoPol;
-        tSolution[1] = tDopplerFrequency;
+//        tSolution[1] = tDopplerFrequency;
+        tSolution[1] = tCurrentParticle.GetCyclotronFrequency();  // testing no Doppler
 
 	    return tSolution;
 
