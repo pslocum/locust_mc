@@ -33,6 +33,7 @@ namespace locust
         fNElementsPerStrip( 0. ),
 		fNSubarrays( 1 ),
 		fZShiftArray( 0. ),
+        fNPlanarArrayRows( 1 ),
         fElementSpacing( 0. ),
         gxml_filename("blank.xml"),
 		fTextFileWriting( 0 ),
@@ -82,6 +83,17 @@ namespace locust
         			LERROR(lmclog,"Error configuring slotted waveguide.");
         		}
         	}
+
+            if(aParam["power-combining-feed"]().as_string() == "planar-array")
+            {
+                // would be nice to throw an error if fNPlanarArrayRows < 2. Where?
+                npowercombiners += 1;
+                fPowerCombiner = new PlanarArray;
+                if(!fPowerCombiner->Configure(aParam))
+                {
+                    LERROR(lmclog,"Error configuring planar array.");
+                }
+            }
 
         	if(aParam["power-combining-feed"]().as_string() == "single-patch")
         	{
@@ -243,6 +255,11 @@ namespace locust
         if( aParam.has( "n-subarrays" ) )
         {
             fNSubarrays = aParam["n-subarrays"]().as_int();
+        }
+
+        if( aParam.has( "n-planar-array-rows" ) )
+        {
+            fNPlanarArrayRows = aParam["n-planar-array-rows"]().as_int();
         }
 
         if( aParam.has( "element-spacing" ) )
@@ -478,14 +495,18 @@ namespace locust
 
         const unsigned nChannels = fNChannels;
         const unsigned nSubarrays = fNSubarrays;
+        const unsigned nPlanarArrayRows = fNPlanarArrayRows;
         const int nReceivers = fNElementsPerStrip;
 
         const double elementSpacingZ = fElementSpacing;
         const double elementRadius = fArrayRadius;
         double zPosition;
         double theta;
+        double thetaAdjust;
         const double dThetaArray = 2. * LMCConst::Pi() / (nChannels/nSubarrays); //Divide the circle into nChannels
         const double dRotateVoltages = 0.;  // set to zero to not rotate element polarities.
+
+        const double planarRowSpacing = 0.009636; // temporarily hard-coded distance between adjacent planar array rows.
 
         allRxChannels.resize(nChannels);
 
@@ -503,6 +524,22 @@ namespace locust
         			{
         				zPosition = 0.;
         			}
+
+                    if (nPlanarArrayRows > 1)
+                    {
+                        zPosition = fZShiftArray + 
+                        (int(channelIndex/(nChannels/nSubarrays))-((nSubarrays -1.)/2.))*(nReceivers/2.)*elementSpacingZ +
+                        ((receiverIndex % (nReceivers/nPlanarArrayRows)) - ((nReceivers/nPlanarArrayRows) - 1.) /2.) * elementSpacingZ;
+                    
+                        theta = channelIndex * dThetaArray;
+                        thetaAdjust = atan(((int(receiverIndex/(nReceivers/nPlanarArrayRows)) - ((nPlanarArrayRows - 1.)/2.))*planarRowSpacing)/elementRadius);
+                        theta += thetaAdjust;
+
+                        // check:
+                        printf("element %d zPosition is %f\n", receiverIndex, zPosition);
+                        printf("element %d theta ang is %f\n", receiverIndex, theta);
+                        getchar();
+                    }
 
         			Receiver* modelElement = fPowerCombiner->ChooseElement();  // patch or slot?
 

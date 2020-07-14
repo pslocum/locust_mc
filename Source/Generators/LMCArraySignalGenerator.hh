@@ -14,6 +14,7 @@
 #include "LMCPowerCombiner.hh"
 #include "LMCVoltageDivider.hh"
 #include "LMCSlottedWaveguide.hh"
+#include "LMCPlanarArray.hh"
 #include "LMCSinglePatch.hh"
 #include "LMCCorporateFeed.hh"
 #include "LMCsMatrix.hh"
@@ -79,6 +80,7 @@ namespace locust
             double fArrayRadius;
             int fNElementsPerStrip;
             int fNSubarrays;
+            int fNPlanarArrayRows;
             double fZShiftArray;
             double fElementSpacing;
             std::string gxml_filename;
