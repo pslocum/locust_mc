@@ -534,11 +534,7 @@ namespace locust
                         theta = channelIndex * dThetaArray;
                         thetaAdjust = atan(((int(receiverIndex/(nReceivers/nPlanarArrayRows)) - ((nPlanarArrayRows - 1.)/2.))*planarRowSpacing)/elementRadius);
                         theta += thetaAdjust;
-
-                        // check:
-                        printf("element %d zPosition is %f\n", receiverIndex, zPosition);
-                        printf("element %d theta ang is %f\n", receiverIndex, theta);
-                        getchar();
+                    
                     }
 
         			Receiver* modelElement = fPowerCombiner->ChooseElement();  // patch or slot?
