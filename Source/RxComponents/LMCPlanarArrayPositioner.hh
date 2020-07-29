@@ -32,6 +32,11 @@ namespace locust
             PlanarArrayPositioner();
             virtual ~PlanarArrayPositioner();
             virtual bool Configure( const scarab::param_node& aNode );
+            using AntennaElementPositioner::GetPositionZ;
+            virtual double GetPositionZ(double zShiftArray, int channelIndex, int nChannels,
+            		int nSubarrays, int nReceivers, double elementSpacingZ, int receiverIndex, int nPlanarArrayRows);
+          
+            virtual double GetTheta(int channelIndex, int dThetaArray, int receiverIndex, int nReceivers, int nPlanarArrayRows, double planarRowSpacing, double elementRadius);
 
     };
 

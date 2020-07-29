@@ -104,6 +104,12 @@ namespace locust
                 {
                     LERROR(lmclog,"Error configuring planar array.");
                 }
+                fAntennaElementPositioner = new PlanarArrayPositioner;
+                if(!fAntennaElementPositioner->Configure(aParam))
+                {
+                    LERROR(lmclog,"Error configuring planar array positioner.");
+                    exit(-1);
+                }
             }
 
         	if(aParam["power-combining-feed"]().as_string() == "single-patch")
@@ -569,14 +575,13 @@ namespace locust
 
                     if (nPlanarArrayRows > 1)
                     {
-                        zPosition = fZShiftArray + 
-                        (int(channelIndex/(nChannels/nSubarrays))-((nSubarrays -1.)/2.))*(nReceivers/2.)*elementSpacingZ +
-                        ((receiverIndex % (nReceivers/nPlanarArrayRows)) - ((nReceivers/nPlanarArrayRows) - 1.) /2.) * elementSpacingZ;
-                    
-                        theta = channelIndex * dThetaArray;
-                        thetaAdjust = atan(((int(receiverIndex/(nReceivers/nPlanarArrayRows)) - ((nPlanarArrayRows - 1.)/2.))*planarRowSpacing)/elementRadius);
-                        theta += thetaAdjust;
-                    
+                        zPosition = fAntennaElementPositioner->GetPositionZ(fZShiftArray, channelIndex, nChannels,
+                                nSubarrays, nReceivers, elementSpacingZ, receiverIndex, nPlanarArrayRows);
+                        theta = fAntennaElementPositioner->GetTheta(channelIndex, dThetaArray, receiverIndex, nReceivers, nPlanarArrayRows, planarRowSpacing, elementRadius);
+                        
+                        printf("zPosition is %f: \n", zPosition);
+                        printf("theta is %f: \n", theta);
+                        getchar();
                     }
 
         			Receiver* modelElement = fPowerCombiner->ChooseElement();  // patch or slot?
