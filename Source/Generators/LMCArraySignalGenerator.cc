@@ -28,7 +28,6 @@ namespace locust
         fNElementsPerStrip( 0. ),
 		fNSubarrays( 1 ),
 		fZShiftArray( 0. ),
-        fNPlanarArrayRows( 1 ),
         fElementSpacing( 0. ),
         gxml_filename("blank.xml"),
 		fTextFileWriting( 0 ),
@@ -304,11 +303,6 @@ namespace locust
             fNSubarrays = aParam["n-subarrays"]().as_int();
         }
 
-        if( aParam.has( "n-planar-array-rows" ) )
-        {
-            fNPlanarArrayRows = aParam["n-planar-array-rows"]().as_int();
-        }
-
         if( aParam.has( "element-spacing" ) )
         {
             fElementSpacing = aParam["element-spacing"]().as_double();
@@ -477,6 +471,7 @@ namespace locust
 
  	            FillBuffers(aSignal, tFieldSolution[1], tFieldSolution[0], fphiLO, index, channelIndex, elementIndex);
  	            double VoltageFIRSample = GetFIRSample(nfilterbins, dtfilter, channelIndex, elementIndex);
+
  	            fPowerCombiner->AddOneVoltageToStripSum(aSignal, VoltageFIRSample, fphiLO, elementIndex, IndexBuffer[channelIndex*fNElementsPerStrip+elementIndex].front());
                 PopBuffers(channelIndex, elementIndex);
 
@@ -549,40 +544,24 @@ namespace locust
 
         const unsigned nChannels = fNChannels;
         const unsigned nSubarrays = fNSubarrays;
-        const unsigned nPlanarArrayRows = fNPlanarArrayRows;
         const int nReceivers = fNElementsPerStrip;
 
         const double elementSpacingZ = fElementSpacing;
         const double elementRadius = fArrayRadius;
         double zPosition;
         double theta;
-        double thetaAdjust;
         const double dThetaArray = 2. * LMCConst::Pi() / (nChannels/nSubarrays); //Divide the circle into nChannels
         const double dRotateVoltages = 0.;  // set to zero to not rotate element polarities.
-
-        const double planarRowSpacing = 0.009636; // temporarily hard-coded distance between adjacent planar array rows.
 
         allRxChannels.resize(nChannels);
 
         	for(int channelIndex = 0; channelIndex < nChannels; ++channelIndex)
         	{
-        		theta = fAntennaElementPositioner->GetTheta(channelIndex, dThetaArray);
-
         		for(int receiverIndex = 0; receiverIndex < nReceivers; ++receiverIndex)
         		{
         			zPosition = fAntennaElementPositioner->GetPositionZ(fZShiftArray, channelIndex, nChannels,
         						nSubarrays, nReceivers, elementSpacingZ, receiverIndex);
-
-                    if (nPlanarArrayRows > 1)
-                    {
-                        zPosition = fAntennaElementPositioner->GetPositionZ(fZShiftArray, channelIndex, nChannels,
-                                nSubarrays, nReceivers, elementSpacingZ, receiverIndex, nPlanarArrayRows);
-                        theta = fAntennaElementPositioner->GetTheta(channelIndex, dThetaArray, receiverIndex, nReceivers, nPlanarArrayRows, planarRowSpacing, elementRadius);
-                        
-                        printf("zPosition is %f: \n", zPosition);
-                        printf("theta is %f: \n", theta);
-                        getchar();
-                    }
+                    theta = fAntennaElementPositioner->GetTheta(channelIndex, dThetaArray, receiverIndex, nReceivers, elementRadius);
 
         			Receiver* modelElement = fPowerCombiner->ChooseElement();  // patch or slot?
 

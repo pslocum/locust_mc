@@ -33,7 +33,7 @@ namespace locust
     	return zPosition;
     }
 
-    double AntennaElementPositioner::GetTheta(int channelIndex, double dThetaArray)
+    double AntennaElementPositioner::GetTheta(int channelIndex, int dThetaArray, int receiverIndex, int nReceivers, double elementRadius)
     {
     	double tTheta = channelIndex * dThetaArray;
     	return tTheta;

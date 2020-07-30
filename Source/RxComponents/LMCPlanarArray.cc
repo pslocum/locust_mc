@@ -15,7 +15,7 @@ namespace locust
 	LOGGER( lmclog, "PlanarArray" );
 
     PlanarArray::PlanarArray():
-    		fImpedanceTransformation( 0.339 ) // sqrt(50./435.) unless already included in HFSS TF.
+    		fImpedanceTransformation( 0.358 ) // sqrt(50./435.) unless already included in HFSS TF.
     {
     }
 
@@ -51,7 +51,7 @@ namespace locust
 		{
 			double aFactor = fImpedanceTransformation;
 			//Adhoc scaling in case the slotted waveguide has fewer/more slots than 10
-			aFactor = aFactor/sqrt(GetNElementsPerStrip()/10.);
+			aFactor = aFactor/sqrt(GetNElementsPerStrip()/5.);
 			SetDampingFactor(z_index, aFactor);
 		}
 
