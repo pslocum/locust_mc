@@ -33,7 +33,7 @@ namespace locust
             virtual bool Configure( const scarab::param_node& aNode );
             virtual double GetPositionZ(double zShiftArray, int channelIndex, int nChannels,
             		int nSubarrays, int nReceivers, double elementSpacingZ, int receiverIndex);
-            virtual double GetTheta(int channelIndex, int dThetaArray, int receiverIndex, int nReceivers, double elementRadius);
+            virtual double GetTheta(int channelIndex, double dThetaArray, int receiverIndex, int nReceivers, double elementRadius);
 			virtual void PlaceElement(Receiver &modelElement, double elementRadius, double theta, double zPosition);
             virtual bool IsPlanarArray() {return false;};
 

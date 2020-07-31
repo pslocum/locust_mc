@@ -35,7 +35,7 @@ namespace locust
             virtual bool IsPlanarArray();
             virtual double GetPositionZ(double zShiftArray, int channelIndex, int nChannels,
             		int nSubarrays, int nReceivers, double elementSpacingZ, int receiverIndex);
-            virtual double GetTheta(int channelIndex, int dThetaArray, int receiverIndex, int nReceivers, double elementRadius);
+            virtual double GetTheta(int channelIndex, double dThetaArray, int receiverIndex, int nReceivers, double elementRadius);
             virtual void PlaceElement(Receiver &modelElement, double elementRadius, double theta, double zPosition);
 
         private:

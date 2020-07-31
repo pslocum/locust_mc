@@ -62,7 +62,7 @@ namespace locust
         return zPosition;
     }
 
-    double PlanarArrayPositioner::GetTheta(int channelIndex, int dThetaArray, int receiverIndex, int nReceivers, double elementRadius)
+    double PlanarArrayPositioner::GetTheta(int channelIndex, double dThetaArray, int receiverIndex, int nReceivers, double elementRadius)
     {
         double tTheta = channelIndex * dThetaArray;
         SetThetaAdjustment(receiverIndex, nReceivers, elementRadius);
@@ -78,7 +78,7 @@ namespace locust
     void PlanarArrayPositioner::PlaceElement(Receiver &modelElement, double elementRadius, double theta, double zPosition)
     {
         double centralTheta = theta - fThetaAdjustment;
-        modelElement.SetCenterPosition({elementRadius * cos(theta) , elementRadius * sin(theta) , zPosition });
+        modelElement.SetCenterPosition({(elementRadius/cos(fThetaAdjustment)) * cos(theta), (elementRadius/cos(fThetaAdjustment)) * sin(theta) , zPosition });
         modelElement.SetPolarizationDirection({sin(centralTheta), -cos(centralTheta), 0.0});
         modelElement.SetCrossPolarizationDirection({0.0, 0.0, 1.0});  // longitudinal axis of array.
         modelElement.SetNormalDirection({-cos(centralTheta), -sin(centralTheta), 0.0}); //Say normals point inwards
