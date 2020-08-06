@@ -18,7 +18,8 @@ namespace locust
     PlaneWaveTransmitter::PlaneWaveTransmitter():
 		fAOI( 0.),
 		fAmplitude( 0.0 ),
-		fRF_Frequency( 0. )
+		fRF_Frequency( 0. ),
+        fPatternType( 0 )
     {
     }
 
@@ -43,35 +44,57 @@ namespace locust
             fAmplitude= aParam["planewave-amplitude"]().as_double();
 		}
 
+        if( aParam.has( "pattern-plane" ) )
+        {
+            if(aParam["pattern-plane"]().as_string() == "xz-plane")
+            {
+                fPatternType = 0;
+            }
+            if(aParam["pattern-plane"]().as_string() == "xy-plane")
+            {
+                fPatternType = 1;
+            }
+        }
+
 
         return true;
     }
 
     void PlaneWaveTransmitter::AddPropagationPhaseDelay(LMCThreeVector pointOfInterest)
     {
-	//Assuming the element strip is always along Z
+        // Take the end of the array as the first place that the phase front of the planewave touches.
+        double planewaveStart;
+        double distanceFromCenter = 0.0;
 
-      // Some previous attempts to get phase delay:
-      
-	/*double meanZ = GetMeanofFieldPoints(2);
-	  double distanceFromCenter = meanZ - pointOfInterest.GetZ();*/
-	/*int z_index = fieldPointIndex%nElementsPerStrip;
-    	double stripLength = (nElementsPerStrip-1)*elementSpacing;
-    	double distanceFromCenter = stripLength/2. - z_index*elementSpacing;*/
-
-      // Take the end of the array as the first place that the phase front of the planewave touches.
-      double endOfStrip = GetFieldPoint(0).GetZ();
-      double distanceFromCenter = pointOfInterest.GetZ() - endOfStrip;
-    
-    	double phaseDelay = 2*LMCConst::Pi()*distanceFromCenter*sin(fAOI)*fRF_Frequency/LMCConst::C();
-	Transmitter::AddPropagationPhaseDelay(phaseDelay);
+        if(fPatternType == 0)
+        {
+            planewaveStart = GetFieldPoint(0).GetZ();
+            distanceFromCenter = pointOfInterest.GetZ() - planewaveStart;
+        }
+        if(fPatternType == 1)
+        {
+            planewaveStart = GetFieldPoint(0).GetY();
+            distanceFromCenter = pointOfInterest.GetY() - planewaveStart;
+        }
+        double phaseDelay = 2*LMCConst::Pi()*distanceFromCenter*sin(fAOI)*fRF_Frequency/LMCConst::C(); 
+	   Transmitter::AddPropagationPhaseDelay(phaseDelay);
+       printf("phaseDelay for location (%f, %f, %f) is %f\n", pointOfInterest.GetX(), pointOfInterest.GetY(), pointOfInterest.GetZ(), phaseDelay);
     }
 
     void PlaneWaveTransmitter::AddIncidentKVector(LMCThreeVector pointOfInterest)
     {
-	LMCThreeVector incidentKVector(cos(fAOI), 0.0, sin(fAOI));
+        LMCThreeVector incidentKVector(1.0, 0.0, 0.0);
+
+        if(fPatternType == 0)
+        {
+            incidentKVector.SetComponents(cos(fAOI), 0.0, sin(fAOI));
+        }
+        if(fPatternType  == 1)
+        {
+            incidentKVector.SetComponents(cos(fAOI), sin(fAOI), 0.0);
+        }
+	
 	Transmitter::AddIncidentKVector(incidentKVector);
-    	//fIncidentKVector.SetComponents(cos(fAOI), 0.0, sin(fAOI));
     }
 
     double* PlaneWaveTransmitter::GetEFieldCoPol(int fieldPointIndex, double dt)

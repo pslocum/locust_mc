@@ -28,6 +28,10 @@ namespace locust
      Configuration name: "plane-wave"
 
      Available configuration options:
+     - "transmitter-frequency": double -- frequency of plane wave in GHz
+     - "AOI": double -- angle of incidence between the plane wave normal and the antenna normal. Measured in degrees.
+     - "planewave-amplitude": double -- amplitude of plane wave in V/m
+     - "pattern-plane": int -- the plane of the resulting pattern of running AOI -89 to 89: in x-z plane or in x-y plane.
 
      */
     class PlaneWaveTransmitter : public Transmitter
@@ -48,6 +52,7 @@ namespace locust
         double fAmplitude;
         double fRF_Frequency;  // typically defined by a parameter in json file.
         double fPhaseDelay=0.0; //Delay in the phase that changes for each time sample
+        int fPatternType; // the plane in which the antenna pattern will be made
         LMCThreeVector fIncidentKVector;  // vector pointing from plane wave to requested point of interest.
         void AddIncidentKVector(LMCThreeVector pointOfInterest);
         void AddPropagationPhaseDelay(LMCThreeVector pointOfInterest);
